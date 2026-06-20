@@ -1,0 +1,7 @@
+cd "chemin/vers/site de presentation/backend"
+git init
+git add .
+git commit -m "Premier commit - backend Djuman"
+git branch -M main
+git remote add origin https://github.com/TON-USERNAME/djuman-backend.git
+git push -u origin main
