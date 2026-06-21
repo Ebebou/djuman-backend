@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Djuman Admin - Dashboard Waitlist</title>
+    <link rel="shortcut icon" href="/frontend/favicon-32x32.png" type="image/x-icon">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-main: #F6F4E6;
+            --sidebar-dark: #2B323E;
+            --mint-green: #629A72;
+            --text-muted: #595959;
+            --primary-blue: #2B323E;
+            --accent-amber: #BE710A;
+            --white: #fafafa;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--sidebar-dark);
+            font-family: 'Galano Grotesque', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── RESTRICTION MOBILE ── */
+        .mobile-restriction {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            height: 100dvh;
+            padding: 32px;
+            text-align: center;
+            background: var(--bg-main);
+        }
+        .mobile-restriction h2 { font-size: 22px; color: var(--sidebar-dark); }
+        .mobile-restriction p  { font-size: 15px; color: var(--text-muted); max-width: 300px; }
+
+        @media (max-width: 1023px) {
+            .mobile-restriction  { display: flex; }
+            .dashboard-layout    { display: none !important; }
+        }
+
+        /* ── LAYOUT ── */
+        .dashboard-layout { display: flex; min-height: 100vh; }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            width: 260px;
+            background-color: var(--sidebar-dark);
+            color: var(--white);
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+        .sidebar-brand { margin-bottom: 40px; display: flex; align-items: center; }
+        .sidebar-brand img { height: 40px; }
+        .sidebar-menu { list-style: none; padding: 0; margin: 0; flex-grow: 1; }
+        .sidebar-item a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #A0AEC0;
+            padding: 12px 16px;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-weight: 500;
+            transition: all 0.2s ease-in-out;
+        }
+        .sidebar-item.active a,
+        .sidebar-item a:hover {
+            color: var(--white);
+            background-color: rgba(255,255,255,0.08);
+        }
+        .sidebar-item.active a {
+            border-left: 4px solid var(--mint-green);
+            background-color: rgba(255,255,255,0.12);
+        }
+        .btn-logout {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #F7FAFC;
+            background: none;
+            border: none;
+            padding: 12px 16px;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+            font-size: 15px;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+        .btn-logout:hover { background-color: #DC2626; color: var(--white); }
+
+        /* ── MAIN ── */
+        .main-content { flex-grow: 1; padding: 40px; box-sizing: border-box; overflow-x: hidden; }
+
+        .header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 35px;
+        }
+        .header-actions h2 { font-size: 28px; font-weight: 700; color: var(--primary-blue); }
+
+        .btn-export {
+            background-color: var(--primary-blue);
+            color: var(--white);
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 4px rgba(14,58,121,0.1);
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .btn-export:hover { background-color: #1a2333; transform: translateY(-1px); }
+
+        /* ── METRICS ── */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+        .card-metric {
+            background-color: var(--white);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.04);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .metric-info h3 {
+            margin: 0 0 8px;
+            font-size: 13px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.75px;
+            font-weight: 600;
+        }
+        .metric-info p { margin: 0; font-size: 32px; font-weight: 700; color: var(--primary-blue); }
+        .card-metric.accented .metric-info p { color: var(--accent-amber); }
+        .metric-icon {
+            background-color: rgba(98,154,114,0.12);
+            color: var(--mint-green);
+            padding: 12px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .card-metric.accented .metric-icon {
+            background-color: rgba(190,113,10,0.12);
+            color: var(--accent-amber);
+        }
+
+        /* ── TABLE ── */
+        .data-card {
+            background-color: var(--white);
+            border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.04);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        .table-filter-bar {
+            padding: 20px 24px;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--white);
+        }
+        .search-wrapper { position: relative; width: 320px; }
+        .search-wrapper i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+        .search-wrapper input {
+            width: 100%;
+            padding: 10px 14px 10px 42px;
+            border: 1px solid rgba(0,0,0,0.15);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--sidebar-dark);
+            background-color: var(--white);
+            box-sizing: border-box;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .search-wrapper input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(43,50,62,0.1);
+        }
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th {
+            background-color: rgba(0,0,0,0.02);
+            color: var(--text-muted);
+            padding: 16px 24px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+        }
+        td {
+            padding: 16px 24px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            font-size: 14px;
+            color: var(--sidebar-dark);
+            vertical-align: middle;
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background-color: rgba(246,244,230,0.3); }
+        .badge-status {
+            background-color: rgba(98,154,114,0.15);
+            color: #2F5739;
+            padding: 6px 12px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .badge-status::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            background-color: var(--mint-green);
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .spin-icon { animation: spin 1s linear infinite; }
+    </style>
+</head>
+<body>
+
+    <!-- RESTRICTION MOBILE -->
+    <div class="mobile-restriction">
+        <i data-lucide="monitor" style="width:48px;height:48px;color:#629A72;"></i>
+        <h2>Accès Desktop uniquement</h2>
+        <p>L'administration Djuman est réservée aux écrans de bureau pour une expérience optimale.</p>
+    </div>
+
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <img src="/frontend/assets/image/rectangle_blanc.svg" alt="Djuman Logo">
+            </div>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item active">
+                    <a href="#">
+                        <i data-lucide="users" style="width:20px;height:20px;"></i>
+                        <span>Liste d'attente</span>
+                    </a>
+                </li>
+            </ul>
+            <button id="logoutBtn" class="btn-logout">
+                <i data-lucide="log-out" style="width:20px;height:20px;"></i>
+                <span>Déconnexion</span>
+            </button>
+        </aside>
+
+        <main class="main-content">
+            <div class="header-actions">
+                <div>
+                    <h2>Tableau de bord Waitlist</h2>
+                    <p style="margin:6px 0 0;color:var(--text-muted);font-size:15px;">
+                        Suivi en temps réel des inscriptions Djuman.
+                    </p>
+                </div>
+                <button id="exportCsvBtn" class="btn-export">
+                    <i data-lucide="download" style="width:18px;height:18px;"></i>
+                    <span>Exporter en CSV</span>
+                </button>
+            </div>
+
+            <div class="metrics-grid">
+                <div class="card-metric">
+                    <div class="metric-info">
+                        <h3>Total Inscrits</h3>
+                        <p id="totalInscriptions">—</p>
+                    </div>
+                    <div class="metric-icon">
+                        <i data-lucide="user-check" style="width:24px;height:24px;"></i>
+                    </div>
+                </div>
+                <div class="card-metric accented">
+                    <div class="metric-info">
+                        <h3>Inscrits ce jour</h3>
+                        <p id="todayInscriptions">—</p>
+                    </div>
+                    <div class="metric-icon">
+                        <i data-lucide="zap" style="width:24px;height:24px;"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="data-card">
+                <div class="table-filter-bar">
+                    <div class="search-wrapper">
+                        <i data-lucide="search" style="width:16px;height:16px;"></i>
+                        <input type="text" id="searchInput"
+                            placeholder="Rechercher un entrepreneur ou un commerce...">
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nom Complet</th>
+                                <th>Email</th>
+                                <th>Téléphone</th>
+                                <th>Nom du Commerce</th>
+                                <th>Secteur d'activité</th>
+                                <th>Date d'inscription</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody id="waitlistTableBody">
+                            <tr id="tableStatusRow">
+                                <td colspan="7" style="text-align:center;padding:48px;">
+                                    <div id="statusContainer"
+                                        style="display:flex;flex-direction:column;align-items:center;gap:12px;justify-content:center;">
+                                        <i data-lucide="loader-2" class="spin-icon"
+                                            style="width:24px;height:24px;color:var(--primary-blue);"></i>
+                                        <span style="color:var(--text-muted);">Chargement des inscrits en cours...</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>lucide.createIcons();</script>
+    <script src="js/admin.js"></script>
+
+</body>
+</html>
