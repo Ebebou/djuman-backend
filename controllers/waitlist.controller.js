@@ -5,15 +5,7 @@ require("dotenv").config();
 // ============================================
 // CONFIGURATION NODEMAILER → BREVO SMTP
 // ============================================
-const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
-  port: parseInt(process.env.EMAIL_PORT) || 587,
-  secure: false,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+
 
 // Vérification de la connexion SMTP au démarrage du serveur
 transporter.verify((error, success) => {
@@ -31,7 +23,7 @@ transporter.verify((error, success) => {
 // Inspiré de la sobriété Google, couleurs Djuman.
 // ============================================
 function buildWelcomeEmail(prenom) {
-    return `
+  return `
     <!DOCTYPE html>
     <html lang="fr">
     <head>
@@ -227,6 +219,16 @@ const getAll = async (req, res) => {
     });
   }
 };
+
+const transporter = nodemailer.createTransport({
+  host: process.env.EMAIL_HOST,
+  port: parseInt(process.env.EMAIL_PORT) || 465,
+  secure: true, // ← change false en true
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
 // ============================================
 // CONTRÔLEUR : EXPORT CSV (Admin)
