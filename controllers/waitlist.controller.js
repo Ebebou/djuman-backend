@@ -1,21 +1,26 @@
 const WaitlistModel = require("../models/waitlist.model");
-const Brevo = require("@getbrevo/brevo");
-
-const brevoClient = Brevo.ApiClient.instance;
-brevoClient.authentications["api-key"].apiKey = process.env.BREVO_API_KEY;
-
-const emailApi = new Brevo.TransactionalEmailsApi();
+require("dotenv").config();
 
 async function sendWelcomeEmail(prenom, email) {
-  await emailApi.sendTransacEmail({
-    sender: { name: "Djuman", email: process.env.EMAIL_FROM },
-    to: [{ email }],
-    subject: `Bienvenue sur Djuman, ${prenom} ! 🚀`,
-    htmlContent: buildWelcomeEmail(prenom),
+  const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "api-key": process.env.BREVO_API_KEY,
+    },
+    body: JSON.stringify({
+      sender: { name: "Djuman", email: process.env.EMAIL_FROM },
+      to: [{ email }],
+      subject: `Bienvenue sur Djuman, ${prenom} ! 🚀`,
+      htmlContent: buildWelcomeEmail(prenom),
+    }),
   });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || "Erreur API Brevo");
+  }
 }
-
-
 // ============================================
 // TEMPLATE EMAIL DE BIENVENUE (HTML stylé Djuman)
 // Inspiré de la sobriété Google, couleurs Djuman.
