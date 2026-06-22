@@ -16,29 +16,26 @@ const PORT = process.env.PORT || 5000;
 
 // CORS : autorise les requêtes depuis le frontend public (à restreindre en prod)
 
-
 const allowedOrigins = [
   "https://djuman.vercel.app",
   "http://localhost:3000",
   "http://127.0.0.1:5500",
-  "http://localhost:5500"
+  "http://localhost:5500",
 ];
-
 
 app.use(
   cors({
     origin(origin, callback) {
       if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Origine non autorisée"));
+        return callback(null, true);
       }
+
+      return callback(new Error("Origine non autorisée"));
     },
     methods: ["GET", "POST", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-
 
 // Parse les corps de requêtes JSON
 app.use(express.json());
@@ -78,7 +75,6 @@ app.use((err, req, res, next) => {
 
 // Route 404 pour toutes les autres requêtes API non trouvées
 
-
 app.use("/api/*path", (req, res) => {
   res.status(404).json({
     success: false,
@@ -86,13 +82,14 @@ app.use("/api/*path", (req, res) => {
   });
 });
 
-
 // ============================================
 // DÉMARRAGE DU SERVEUR
 // ============================================
-app.listen(PORT,  "0.0.0.0", () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(` Serveur Djuman démarré sur le port ${PORT}`);
 });
+
+
 
 
 /*
