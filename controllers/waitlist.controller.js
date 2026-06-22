@@ -1,3 +1,4 @@
+console.log("🔥 waitlist.controller.js chargé");
 const WaitlistModel = require("../models/waitlist.model");
 const nodemailer = require("nodemailer");
 require("dotenv").config();
