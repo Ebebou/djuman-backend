@@ -7,6 +7,16 @@ require("dotenv").config();
 // ============================================
 
 
+const transporter = nodemailer.createTransport({
+  host: process.env.EMAIL_HOST,
+  port: parseInt(process.env.EMAIL_PORT) || 465,
+  secure: true, // ← change false en true
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
 // Vérification de la connexion SMTP au démarrage du serveur
 transporter.verify((error, success) => {
   if (error) {
@@ -220,15 +230,7 @@ const getAll = async (req, res) => {
   }
 };
 
-const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
-  port: parseInt(process.env.EMAIL_PORT) || 465,
-  secure: true, // ← change false en true
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+
 
 // ============================================
 // CONTRÔLEUR : EXPORT CSV (Admin)
