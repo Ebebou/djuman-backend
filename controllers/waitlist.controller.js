@@ -1,4 +1,4 @@
-console.log("🔥 waitlist.controller.js chargé");
+
 const WaitlistModel = require("../models/waitlist.model");
 const nodemailer = require("nodemailer");
 require("dotenv").config();
@@ -7,7 +7,6 @@ require("dotenv").config();
 // CONFIGURATION NODEMAILER → BREVO SMTP
 // ============================================
 
-console.log("1️⃣ Avant createTransport");
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
   port: parseInt(process.env.EMAIL_PORT) || 465,
@@ -18,11 +17,9 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-console.log("2️⃣ Après createTransport");
 
 // Vérification de la connexion SMTP au démarrage du serveur
 transporter.verify((error, success) => {
-  console.log("3️⃣ verify() exécuté");
   if (error) {
     console.error("❌ Connexion SMTP Brevo ÉCHOUÉE :", error.message);
   } else {
