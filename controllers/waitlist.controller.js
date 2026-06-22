@@ -1,33 +1,22 @@
-
 const WaitlistModel = require("../models/waitlist.model");
 const nodemailer = require("nodemailer");
 require("dotenv").config();
+const Brevo = require("@getbrevo/brevo");
 
-// ============================================
-// CONFIGURATION NODEMAILER → BREVO SMTP
-// ============================================
+const brevoClient = Brevo.ApiClient.instance;
+brevoClient.authentications["api-key"].apiKey = process.env.BREVO_API_KEY;
 
-const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
-  port: parseInt(process.env.EMAIL_PORT) || 465,
-  secure: true, // ← change false en true
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+const emailApi = new Brevo.TransactionalEmailsApi();
 
+async function sendWelcomeEmail(prenom, email) {
+  await emailApi.sendTransacEmail({
+    sender: { name: "Djuman", email: process.env.EMAIL_FROM },
+    to: [{ email }],
+    subject: `Bienvenue sur Djuman, ${prenom} ! 🚀`,
+    htmlContent: buildWelcomeEmail(prenom),
+  });
+}
 
-// Vérification de la connexion SMTP au démarrage du serveur
-transporter.verify((error, success) => {
-  if (error) {
-    console.error("❌ Connexion SMTP Brevo ÉCHOUÉE :", error.message);
-  } else {
-    console.log(
-      "✅ Connexion SMTP Brevo vérifiée — prêt à envoyer des emails."
-    );
-  }
-});
 
 
 // ============================================
