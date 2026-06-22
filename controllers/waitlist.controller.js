@@ -1,6 +1,4 @@
 const WaitlistModel = require("../models/waitlist.model");
-const nodemailer = require("nodemailer");
-require("dotenv").config();
 const Brevo = require("@getbrevo/brevo");
 
 const brevoClient = Brevo.ApiClient.instance;
@@ -16,7 +14,6 @@ async function sendWelcomeEmail(prenom, email) {
     htmlContent: buildWelcomeEmail(prenom),
   });
 }
-
 
 
 // ============================================
