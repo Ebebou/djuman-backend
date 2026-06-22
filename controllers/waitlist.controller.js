@@ -1,4 +1,196 @@
-const WaitlistModel = require("../models/waitlist.model");
+  try {
+    const existing = await WaitlistModel.findByEmail(email);
+    if (existing) {
+      return res.status(409).json({
+        success: false,
+        message: "Cette adresse e-mail est déjà enregistrée sur notre liste d'attente.",
+      });
+    }
+
+    await WaitlistModel.create(req.body);
+
+    console.log(`📤 Tentative d'envoi d'email vers ${email}...`);
+    try {
+      await sendWelcomeEmail(prenom, email);
+      console.log(`✅ Email envoyé à ${email}`);
+    } catch (err) {
+      console.error(`❌ ÉCHEC email :`, err.message);
+    }
+
+    res.status(201).json({
+      success: true,
+      message: "Inscription réussie. Un email de confirmation a été envoyé.",
+    });
+
+  } catch (error) {
+    console.error("Erreur inscription waitlist :", error.message);
+    return res.status(500).json({
+      success: false,
+      message: "Une erreur serveur est survenue. Réessaie dans un instant.",
+    });
+  }
+};
+Remplace tout le bloc try { ... } jusqu'à la dernière }; par ça, puis push.Vous avez dit : const WaitlistModel = require(".const WaitlistModel = require("../models/waitlist.model");
+require("dotenv").config();
+async function sendWelcomeEmail(prenom, email) {
+  const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "api-key": process.env.BREVO_API_KEY,
+    },
+    body: JSON.stringify({
+      sender: { name: "Djuman", email: process.env.EMAIL_FROM },
+      to: [{ email }],
+      subject: Bienvenue sur Djuman, ${prenom} ! 🚀,
+      htmlContent: buildWelcomeEmail(prenom),
+    }),
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || "Erreur API Brevo");
+  }
+}
+// ============================================
+// TEMPLATE EMAIL DE BIENVENUE (HTML stylé Djuman)
+// Inspiré de la sobriété Google, couleurs Djuman.
+// ============================================
+function buildWelcomeEmail(prenom) {
+  return   ;
+}
+// ============================================
+// CONTRÔLEUR : INSCRIPTION WAITLIST
+// ============================================
+const register = async (req, res) => {
+  const {
+    nom,
+    prenom,
+    email,
+    telephone,
+    nom_entreprise,
+    secteur_activite,
+    canal_vente,
+  } = req.body;
+  if (
+    !nom ||
+    !prenom ||
+    !email ||
+    !telephone ||
+    !secteur_activite ||
+    !canal_vente
+  ) {
+    return res.status(400).json({
+      success: false,
+      message: "Tous les champs obligatoires doivent être remplis.",
+    });
+  }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({
+      success: false,
+      message: "Adresse email invalide.",
+    });
+  }
+  try {
+    const existing = await WaitlistModel.findByEmail(email);
+    if (existing) {
+      return res.status(409).json({
+        success: false,
+        message:
+          "Cette adresse e-mail est déjà enregistrée sur notre liste d'attente.",
+      });
+    }
+await WaitlistModel.create(req.body);
+console.log(📤 Tentative d'envoi d'email vers ${email}...);
+try {
+  await sendWelcomeEmail(prenom, email);
+  console.log(✅ Email envoyé à ${email});
+} catch (err) {
+  console.error(❌ ÉCHEC email :, err.message);
+}
+res.status(201).json({
+  success: true,
+  message: "Inscription réussie. Un email de confirmation a été envoyé.",
+});
+    return res.status(500).json({
+      success: false,
+      message: "Une erreur serveur est survenue. Réessaie dans un instant.",
+    });
+  }
+};
+// ============================================
+// CONTRÔLEUR : LISTE DES INSCRITS (Admin)
+// ============================================
+const getAll = async (req, res) => {
+  try {
+    const search = req.query.search || "";
+    const inscrits = await WaitlistModel.findAll(search);
+    const total = await WaitlistModel.count();
+    return res.status(200).json({
+      success: true,
+      total,
+      data: inscrits,
+    });
+  } catch (error) {
+    console.error("Erreur récupération waitlist :", error.message);
+    return res.status(500).json({
+      success: false,
+      message: "Impossible de récupérer la liste.",
+    });
+  }
+};
+// ============================================
+// CONTRÔLEUR : EXPORT CSV (Admin)
+// ============================================
+const exportCSV = async (req, res) => {
+  try {
+    const inscrits = await WaitlistModel.findAll();
+    const headers = [
+      "ID",
+      "Nom",
+      "Prénom",
+      "Email",
+      "Téléphone",
+      "Entreprise",
+      "Secteur d'activité",
+      "Canal de vente",
+      "Date d'inscription",
+    ];
+    const rows = inscrits.map((i) => [
+      i.id,
+      i.last_name,
+      i.first_name,
+      i.email,
+      i.phone,
+      i.company_name || "",
+      i.business_type,
+      i.sales_platform,
+      new Date(i.created_at).toLocaleString("fr-FR", {
+        timeZone: "Africa/Abidjan",
+      }),
+    ]);
+    const escapeCSV = (val) => "${String(val).replace(/"/g, '""')}";
+    const csvContent = [
+      headers.map(escapeCSV).join(","),
+      ...rows.map((row) => row.map(escapeCSV).join(",")),
+    ].join("\r\n");
+    const BOM = "\uFEFF";
+    const csvWithBOM = BOM + csvContent;
+    const filename = djuman_waitlist_${
+      new Date().toISOString().split("T")[0]
+    }.csv;
+    res.setHeader("Content-Type", "text/csv; charset=utf-8");
+    res.setHeader("Content-Disposition", attachment; filename="${filename}");
+    return res.status(200).send(csvWithBOM);
+  } catch (error) {
+    console.error("Erreur export CSV :", error.message);
+    return res.status(500).json({
+      success: false,
+      message: "Impossible de générer l'export CSV.",
+    });
+  }
+};
+module.exports = { register, getAll, exportCSV };Afficher plus23:32Identified and rectified control flow defects in async handlerIdentified and rectified control flow defects in async handlerVoici le fichier complet et corrigé — copie-colle tout :javascriptconst WaitlistModel = require("../models/waitlist.model");
 require("dotenv").config();
 
 async function sendWelcomeEmail(prenom, email) {
@@ -15,16 +207,12 @@ async function sendWelcomeEmail(prenom, email) {
       htmlContent: buildWelcomeEmail(prenom),
     }),
   });
-
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.message || "Erreur API Brevo");
   }
 }
-// ============================================
-// TEMPLATE EMAIL DE BIENVENUE (HTML stylé Djuman)
-// Inspiré de la sobriété Google, couleurs Djuman.
-// ============================================
+
 function buildWelcomeEmail(prenom) {
   return `
     <!DOCTYPE html>
@@ -117,75 +305,6 @@ function buildWelcomeEmail(prenom) {
     </html>
     `;
 }
-
-// ============================================
-// CONTRÔLEUR : INSCRIPTION WAITLIST
-// ============================================
-const register = async (req, res) => {
-  const {
-    nom,
-    prenom,
-    email,
-    telephone,
-    nom_entreprise,
-    secteur_activite,
-    canal_vente,
-  } = req.body;
-
-  if (
-    !nom ||
-    !prenom ||
-    !email ||
-    !telephone ||
-    !secteur_activite ||
-    !canal_vente
-  ) {
-    return res.status(400).json({
-      success: false,
-      message: "Tous les champs obligatoires doivent être remplis.",
-    });
-  }
-
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    return res.status(400).json({
-      success: false,
-      message: "Adresse email invalide.",
-    });
-  }
-
-  try {
-    const existing = await WaitlistModel.findByEmail(email);
-    if (existing) {
-      return res.status(409).json({
-        success: false,
-        message:
-          "Cette adresse e-mail est déjà enregistrée sur notre liste d'attente.",
-      });
-    }
-
-    await WaitlistModel.create(req.body);
-
-    // --- Réponse succès envoyée immédiatement à l'utilisateur ---
-    res.status(201).json({
-      success: true,
-      message: "Inscription réussie. Un email de confirmation a été envoyé.",
-    });
-
-    // --- Envoi de l'email de bienvenue (après la réponse, avec logs clairs) ---
-console.log(`📤 Tentative d'envoi d'email vers ${email}...`);
-sendWelcomeEmail(prenom, email)
-  .then(() => console.log(`✅ Email envoyé à ${email}`))
-  .catch((err) => console.error(`❌ ÉCHEC email :`, err.message));
-  } catch (error) {
-    console.error("Erreur inscription waitlist :", error.message);
-    return res.status(500).json({
-      success: false,
-      message: "Une erreur serveur est survenue. Réessaie dans un instant.",
-    });
-  }
-};
-
 // ============================================
 // CONTRÔLEUR : LISTE DES INSCRITS (Admin)
 // ============================================
@@ -194,22 +313,12 @@ const getAll = async (req, res) => {
     const search = req.query.search || "";
     const inscrits = await WaitlistModel.findAll(search);
     const total = await WaitlistModel.count();
-
-    return res.status(200).json({
-      success: true,
-      total,
-      data: inscrits,
-    });
+    return res.status(200).json({ success: true, total, data: inscrits });
   } catch (error) {
     console.error("Erreur récupération waitlist :", error.message);
-    return res.status(500).json({
-      success: false,
-      message: "Impossible de récupérer la liste.",
-    });
+    return res.status(500).json({ success: false, message: "Impossible de récupérer la liste." });
   }
 };
-
-
 
 // ============================================
 // CONTRÔLEUR : EXPORT CSV (Admin)
@@ -217,56 +326,24 @@ const getAll = async (req, res) => {
 const exportCSV = async (req, res) => {
   try {
     const inscrits = await WaitlistModel.findAll();
-
-    const headers = [
-      "ID",
-      "Nom",
-      "Prénom",
-      "Email",
-      "Téléphone",
-      "Entreprise",
-      "Secteur d'activité",
-      "Canal de vente",
-      "Date d'inscription",
-    ];
-
+    const headers = ["ID", "Nom", "Prénom", "Email", "Téléphone", "Entreprise", "Secteur d'activité", "Canal de vente", "Date d'inscription"];
     const rows = inscrits.map((i) => [
-      i.id,
-      i.last_name,
-      i.first_name,
-      i.email,
-      i.phone,
-      i.company_name || "",
-      i.business_type,
-      i.sales_platform,
-      new Date(i.created_at).toLocaleString("fr-FR", {
-        timeZone: "Africa/Abidjan",
-      }),
+      i.id, i.last_name, i.first_name, i.email, i.phone,
+      i.company_name || "", i.business_type, i.sales_platform,
+      new Date(i.created_at).toLocaleString("fr-FR", { timeZone: "Africa/Abidjan" }),
     ]);
-
     const escapeCSV = (val) => `"${String(val).replace(/"/g, '""')}"`;
-
     const csvContent = [
       headers.map(escapeCSV).join(","),
       ...rows.map((row) => row.map(escapeCSV).join(",")),
     ].join("\r\n");
-
-    const BOM = "\uFEFF";
-    const csvWithBOM = BOM + csvContent;
-
-    const filename = `djuman_waitlist_${
-      new Date().toISOString().split("T")[0]
-    }.csv`;
+    const filename = `djuman_waitlist_${new Date().toISOString().split("T")[0]}.csv`;
     res.setHeader("Content-Type", "text/csv; charset=utf-8");
     res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
-
-    return res.status(200).send(csvWithBOM);
+    return res.status(200).send("\uFEFF" + csvContent);
   } catch (error) {
     console.error("Erreur export CSV :", error.message);
-    return res.status(500).json({
-      success: false,
-      message: "Impossible de générer l'export CSV.",
-    });
+    return res.status(500).json({ success: false, message: "Impossible de générer l'export CSV." });
   }
 };
 
