@@ -171,24 +171,10 @@ const register = async (req, res) => {
     });
 
     // --- Envoi de l'email de bienvenue (après la réponse, avec logs clairs) ---
-    console.log(`📤 Tentative d'envoi d'email vers ${email}...`);
-
-    transporter
-      .sendMail({
-        from: `"Djuman" <${process.env.EMAIL_FROM}>`,
-        to: email,
-        subject: `Bienvenue sur Djuman, ${prenom} ! 🚀`,
-        html: buildWelcomeEmail(prenom),
-      })
-      .then((info) => {
-        console.log(
-          `✅ Email envoyé avec succès à ${email} — ID: ${info.messageId}`
-        );
-      })
-      .catch((err) => {
-        console.error(`❌ ÉCHEC envoi email pour ${email} :`, err.message);
-        console.error("Détails complets :", err);
-      });
+console.log(`📤 Tentative d'envoi d'email vers ${email}...`);
+sendWelcomeEmail(prenom, email)
+  .then(() => console.log(`✅ Email envoyé à ${email}`))
+  .catch((err) => console.error(`❌ ÉCHEC email :`, err.message));
   } catch (error) {
     console.error("Erreur inscription waitlist :", error.message);
     return res.status(500).json({
