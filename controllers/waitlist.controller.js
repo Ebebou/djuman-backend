@@ -28,6 +28,7 @@ transporter.verify((error, success) => {
   }
 });
 
+
 // ============================================
 // TEMPLATE EMAIL DE BIENVENUE (HTML stylé Djuman)
 // Inspiré de la sobriété Google, couleurs Djuman.
