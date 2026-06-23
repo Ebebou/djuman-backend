@@ -7,6 +7,12 @@ require("dotenv").config();
 // CONTRÔLEUR : CONNEXION ADMIN
 // POST /api/auth/login
 // ============================================
+
+const login = async (req, res) => {
+  console.log("🔐 Login tenté avec :", req.body); // ← ajoute cette ligne
+  const { email, password } = req.body;
+  ...
+
 const login = async (req, res) => {
   const { email, password } = req.body;
 
