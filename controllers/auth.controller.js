@@ -12,9 +12,6 @@ const login = async (req, res) => {
   console.log("🔐 Login tenté avec :", req.body); // ← ajoute cette ligne
   const { email, password } = req.body;
 
-const login = async (req, res) => {
-  const { email, password } = req.body;
-
   // Validation basique
   if (!email || !password) {
     return res.status(400).json({
