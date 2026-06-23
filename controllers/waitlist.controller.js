@@ -99,7 +99,7 @@ function buildWelcomeEmail(prenom) {
                                 <hr style="border:none; border-top: 1px solid #e8e6d9; margin:0 0 24px;">
                                 <p style="color:#888780; font-size:12px; line-height:1.6; margin:0;">
                                     Djuman · Abidjan, Côte d'Ivoire<br>
-                                    Vous recevez cet email car vous êtes inscrit(e) sur djuman.com
+                                    Vous recevez cet email car vous êtes inscrit(e) sur djuman.vercel.app
                                 </p>
                             </td>
                         </tr>
