@@ -18,19 +18,12 @@ const PORT = process.env.PORT || 5000;
 
 const allowedOrigins = [
   "https://djuman.vercel.app",
+  "https://djuman-backend-3jfy.onrender.com",
   "http://localhost:3000",
   "http://127.0.0.1:5500",
   "http://localhost:5500",
 ];
 
-app.use((err, req, res, next) => {
-  console.error("Erreur serveur non gérée :", err.stack); // ← déjà là
-  console.error("Route concernée :", req.method, req.url); // ← ajoute ça
-  res.status(500).json({
-    success: false,
-    message: "Une erreur interne est survenue.",
-  });
-});
 
 app.use(
   cors({
