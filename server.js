@@ -23,6 +23,15 @@ const allowedOrigins = [
   "http://localhost:5500",
 ];
 
+app.use((err, req, res, next) => {
+  console.error("Erreur serveur non gérée :", err.stack); // ← déjà là
+  console.error("Route concernée :", req.method, req.url); // ← ajoute ça
+  res.status(500).json({
+    success: false,
+    message: "Une erreur interne est survenue.",
+  });
+});
+
 app.use(
   cors({
     origin(origin, callback) {
