@@ -11,7 +11,7 @@ async function sendWelcomeEmail(prenom, email) {
     body: JSON.stringify({
       sender: { name: "Djuman", email: process.env.EMAIL_FROM },
       to: [{ email }],
-      subject: `Bienvenue sur Djuman, ${prenom} ! 🚀`,
+      subject: `Bienvenue sur Djuman, ${prenom} !`,
       htmlContent: buildWelcomeEmail(prenom),
     }),
   });
@@ -40,7 +40,7 @@ function buildWelcomeEmail(prenom) {
                         <!-- LOGO -->
                         <tr>
                             <td style="padding: 40px 40px 32px; text-align:center;">
-                                <img src="https://djuman.vercel.app/assets/image/logo-email.png" alt="Djuman" style="height:28px;">
+                                <img src="https://djuman.vercel.app/assets/image/logo_carr%C3%A9_fond_classique.png" alt="Djuman" style="height:28px;">
                             </td>
                         </tr>
 
